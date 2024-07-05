@@ -18,15 +18,6 @@ class CustomUserCreationForm(UserCreationForm):
             'username': {
                 'unique': '이미 사용 중인 사용자 이름입니다. 다른 이름을 사용해 주세요.',
             },
-            'password1': {
-            'required': '비밀번호를 입력해 주세요.',
-            'min_length': '비밀번호는 최소 8자 이상이어야 합니다.',
-            'password_mismatch': '비밀번호가 일치하지 않습니다.',
-            'too_common': '비밀번호가 너무 흔합니다. 더 강력한 비밀번호를 사용하세요.',
-            'too_short': '비밀번호가 너무 짧습니다. 8자 이상으로 입력하세요.',
-            'common_password': '비밀번호가 너무 흔합니다. 다른 비밀번호를 사용하세요.',
-            'password_validation_failed': '비밀번호 검증에 실패했습니다. 유효한 비밀번호를 입력하세요.',
-            }
             
             
         }
