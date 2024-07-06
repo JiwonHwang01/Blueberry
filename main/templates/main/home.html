@@ -2,5 +2,11 @@
 
 {% block content %}
 <h2>Welcome to 블루베리!</h2>
-<p>이곳에서 과일을 주문하고 후기를 작성할 수 있습니다.</p>
+
+{% if user.is_authenticated %}
+    <p><a href ="{% url 'create_order' %}">주문하기</a></p>
+    <p><a href ="{% url 'home' %}">후기 작성하기</a></p>
+{% else %}
+    <p><a href ="{% url 'home' %}">후기 게시판</a></p>
+{% endif %}
 {% endblock %}
