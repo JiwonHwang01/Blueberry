@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<a href="{% url 'home' %}">홈으로 가기</a>
   <h2>리뷰 목록</h2>
   <ul>
     {% for review in reviews %}
       <li>
-        <strong>{{ review.user.username }}</strong> rated <strong>{{ review.item.name }}</strong>
-        <p>Rating: {{ review.rating }}</p>
-        <p>{{ review.comment }}</p>
+        <strong>작성자: </strong>{{ review.user.username }}<br>
+        <strong>품목: </strong>{{ review.item.name }}, {{ review.item.size }}<br>
+        <strong>내용: </strong>{{ review.comment }}<br>
         {% if review.image %}
-          <img src="{{ review.image.url }}" alt="Review Image">
+          <img src="{{ review.image.url }}" alt="Review Image" width=250px>
         {% endif %}
-        <p>{{ review.created_at }}</p>
+        <br><strong>작성일자: </strong>{{ review.created_at }}
       </li>
     {% endfor %}
   </ul>

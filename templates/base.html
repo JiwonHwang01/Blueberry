@@ -8,10 +8,10 @@
         <h1>블루베리</h1>
         {% if user.is_authenticated %}
             <p>Welcome, {{ user.username }}!</p>
-            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'logout' %}">로그아웃</a>
         {% else %}
-            <a href="{% url 'signup' %}">Sign Up</a>
-            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'signup' %}">가입</a>
+            <a href="{% url 'login' %}">로그인</a>
         {% endif %}
     </header>
     <nav>
