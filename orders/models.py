@@ -10,17 +10,18 @@ class Item(models.Model):
     ]
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=20,choices=CATEGORY_CHOICES)
-    price_per_small = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    price_per_big = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_per_small = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    price_per_big = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    price_per_unit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 class Order(models.Model):
     SIZE_CHOICES = [
-        ('small', 'Small'),
-        ('big', 'Big'),
+        ('small', '소과'),
+        ('big', '대과'),
+        ('none', '모종(해당없음)'),
     ]
     
     STATUS_CHOICES = [
@@ -36,11 +37,14 @@ class Order(models.Model):
     quantity = models.PositiveIntegerField()
     name = models.CharField(max_length=100)
     contact = models.CharField(max_length=100)
-    address = models.TextField()
+    postcode = models.CharField(max_length=10)
+    address = models.CharField(max_length=255)
+    extra_address = models.CharField(max_length=255, blank=True)
+    detail_address = models.CharField(max_length=255)
     preferred_delivery_date = models.DateField()
     depositor_name = models.CharField(max_length=100)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='입금확인중')
+    total_price = models.DecimalField(max_digits=10, decimal_places=0, editable=False)
 
     def save(self, *args, **kwargs):
         if self.item.category == 'fruit':
