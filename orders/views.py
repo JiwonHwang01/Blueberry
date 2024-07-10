@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
+from .models import Order
 
 # Create your views here.
 @login_required
@@ -20,3 +21,8 @@ def create_order(request):
 @login_required
 def order_success(request):
     return render(request, 'orders/order_success.html')
+
+@login_required
+def order_list(request):
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'orders/order_list.html', {'orders': orders})
