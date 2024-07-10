@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>리뷰 목록</h2>
+  <ul>
+    {% for review in reviews %}
+      <li>
+        <strong>{{ review.user.username }}</strong> rated <strong>{{ review.item.name }}</strong>
+        <p>Rating: {{ review.rating }}</p>
+        <p>{{ review.comment }}</p>
+        {% if review.image %}
+          <img src="{{ review.image.url }}" alt="Review Image">
+        {% endif %}
+        <p>{{ review.created_at }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'review_create' %}">리뷰 작성</a>
+{% endblock %}
