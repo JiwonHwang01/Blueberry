@@ -2,9 +2,42 @@
 
 {% block content %}
   <h2>리뷰 작성</h2>
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" id="reviewForm">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">제출</button>
+    <p>
+      <strong>
+        <label for="id_item">품목: {{ order.item }} 
+          {% if order.item.category == 'fruit'%}
+            ({{ order.get_size_display }})
+          {% endif %}
+        </label>
+      </strong>
+      
+    </p>
+    <p>
+      {{ form.comment.label_tag }} {{ form.comment }}
+    </p>
+    <p>
+      {{ form.image.label_tag }} {{ form.image }}
+    </p>
+    {{form.item}}{{form.size}}
+    <button type="submit" >완료</button>
   </form>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const reviewForm = document.getElementById('reviewForm');
+      reviewForm.addEventListener('submit', function(event) {
+        let valid = true;
+        const commentField = reviewForm.querySelector('[name="comment"]');
+        const imageField = reviewForm.querySelector('[name="image"]');
+
+        if (!valid) {
+          event.preventDefault(); // 폼 제출을 막음
+        }
+        else{
+          alert('리뷰 작성을 완료했습니다!')
+        }
+      });
+    });
+  </script>
 {% endblock %}
