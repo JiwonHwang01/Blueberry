@@ -8,7 +8,7 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = [
             'item', 'size', 'quantity', 'name', 'contact', 'postcode',
-            'address', 'extra_address', 'detail_address', 'preferred_delivery_date', 'depositor_name'
+            'address', 'detail_address', 'preferred_delivery_date', 'depositor_name'
         ]
         labels = {
             'item': '상품', 
@@ -18,7 +18,6 @@ class OrderForm(forms.ModelForm):
             'contact' : '연락처', 
             'postcode': '우편번호',
             'address': '주소',
-            'extra_address': '참고항목',
             'detail_address': '상세주소',
             'preferred_delivery_date': '배송희망일', 
             'depositor_name' : '입금자명',

@@ -39,7 +39,6 @@ class Order(models.Model):
     contact = models.CharField(max_length=100)
     postcode = models.CharField(max_length=10)
     address = models.CharField(max_length=255)
-    extra_address = models.CharField(max_length=255, blank=True)
     detail_address = models.CharField(max_length=255)
     preferred_delivery_date = models.DateField()
     depositor_name = models.CharField(max_length=100)
