@@ -3,6 +3,12 @@
 {% block content %}
 <a href="{% url 'home' %}">홈으로 가기</a>
 <h2>내 주문 목록</h2>
+<style>
+    table, th, td, tr{
+        border: 1px solid;
+        border-collapse: collapse;
+    }
+</style>
 <table>
     <thead>
         <tr>
@@ -35,19 +41,5 @@
         {% endfor %}
     </tbody>
 </table>
-<ul>
-    {% for order in orders %}
-        <li>
-            <strong>상품:</strong> {{ order.item.name }}<br>
-            <strong>수량:</strong> {{ order.quantity }}<br>
-            <strong>크기:</strong> {{ order.get_size_display }}<br>
-            <strong>총 금액:</strong>{{ order.total_price}}원<br>
-            <strong>배송 주소:</strong> {{ order.address }}, {{order.detail_address}}<br>
-            <strong>배송 희망일:</strong> {{ order.preferred_delivery_date }}<br>
-            <strong>입금자명:</strong> {{ order.depositor_name }}<br>
-            <strong>주문 상태:</strong> {{ order.get_status_display }}<br><br>
-        </li>
-    {% endfor %}
-</ul>
 
 {% endblock %}
