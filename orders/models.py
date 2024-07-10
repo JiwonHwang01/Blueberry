@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Item(models.Model):
     CATEGORY_CHOICES = [
-        ('fruit','Fruit'),
-        ('seed','Seed'),
+        ('fruit','과일'),
+        ('seed','모종'),
         
     ]
     name = models.CharField(max_length=100)
@@ -43,6 +43,7 @@ class Order(models.Model):
     preferred_delivery_date = models.DateField()
     depositor_name = models.CharField(max_length=100)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='입금확인중')
+    review_written = models.BooleanField(default=False) #TODO
     total_price = models.DecimalField(max_digits=10, decimal_places=0, editable=False)
 
     def save(self, *args, **kwargs):

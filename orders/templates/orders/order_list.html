@@ -22,6 +22,7 @@
             <th>총 가격</th>
             <th>주소</th>
             <th>배송희망일</th>
+            <th>리뷰</th>
         </tr>
     </thead>
     <tbody>
@@ -37,6 +38,16 @@
             <td>{{ order.total_price }}원</td>
             <td>{{ order.address }}, {{ order.detail_address }}</td>
             <td>{{ order.preferred_delivery_date }}</td>
+            <td>
+                {% if order.status == 'completed' and not order.review_written %}
+                    <a href="{% url 'review_create' order.id %}">리뷰 쓰기</a>
+                {% elif order.review_written %}
+                    리뷰 작성 완료
+                {% elif order.status != 'completed' %}
+                    <a href="#" onclick="alert('배송이 완료되면 리뷰를 작성할 수 있습니다.')">리뷰 쓰기</a>
+                    
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

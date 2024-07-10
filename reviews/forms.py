@@ -8,6 +8,10 @@ class ReviewForm(forms.ModelForm):
         labels = {
             'item': '상품',
             'size': '과일 크기',
-            'comment': '코멘트',
+            'comment': '내용',
             'image': '이미지',
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['item'].widget = forms.HiddenInput()
+        self.fields['size'].widget = forms.HiddenInput()

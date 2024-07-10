@@ -9,12 +9,12 @@
         <strong>작성자: </strong>{{ review.user.username }}<br>
         <strong>품목: </strong>{{ review.item.name }}, {{ review.get_size_display }}<br>
         <strong>내용: </strong>{{ review.comment }}<br>
+        <strong>작성일자: </strong>{{ review.created_at|date:"Y-m-d" }}<br>
         {% if review.image %}
           <img src="{{ review.image.url }}" alt="Review Image" width=250px>
         {% endif %}
-        <br><strong>작성일자: </strong>{{ review.created_at|date:"Y-m-d" }}
+        <br>
       </li>
     {% endfor %}
   </ul>
-  <a href="{% url 'review_create' %}">리뷰 작성</a>
 {% endblock %}
