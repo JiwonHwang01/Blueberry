@@ -2,9 +2,19 @@
 
 {% block content %}
 <a href="{% url 'home' %}">홈으로 가기</a>
-  <h2>리뷰 목록</h2>
+  <h2>리뷰 목록</h2><strong>리뷰 개수: {{ reviews|length }}<br></strong>
+
+  <form method="get">
+    <strong>품목: </strong>{{ form.item }} <strong>크기: </strong>{{ form.size }} <strong>월: </strong>{{ form.month }}
+    <button type="submit">조회</button>
+    <a href="{% url 'review_list' %}">
+      <button type="button">초기화</button>
+    </a>
+</form>
   <ul>
+    
     {% for review in reviews %}
+      
       <li>
         <strong>작성자: </strong>{{ review.user.username }}<br>
         <strong>품목: </strong>{{ review.item.name }}, {{ review.get_size_display }}<br>

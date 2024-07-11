@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Review
-from .forms import ReviewForm
+from .forms import ReviewForm, ReviewFilterForm
 from orders.models import Order
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,7 +8,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 def review_list(request):
     reviews = Review.objects.all()
-    return render(request, 'reviews/review_list.html', {'reviews': reviews})
+
+    form = ReviewFilterForm(request.GET)
+    
+    if form.is_valid():
+        item = form.cleaned_data.get('item')
+        size = form.cleaned_data.get('size')
+        month = form.cleaned_data.get('month')
+
+        if item:
+            reviews = reviews.filter(item=item)
+        if size:
+            reviews = reviews.filter(size=size)
+        if month:
+            reviews = reviews.filter(created_at__month=month)
+
+    return render(request, 'reviews/review_list.html', {'reviews': reviews, 'form':form})
 
 @login_required
 def review_create(request, order_id):
