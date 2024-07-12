@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'orders',
     'reviews',
     'main',
-    'items'
+    'items',
+    'custom_admin',
 ]
 
 MIDDLEWARE = [
