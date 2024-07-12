@@ -6,5 +6,10 @@
 <p>소형 가격: {{ item.price_per_small }}원</p>
 <p>대형 가격: {{ item.price_per_big }}원</p>
 <p>단위 가격: {{ item.price_per_unit }}원</p>
-<a href="{% url 'item_edit' item.pk %}">수정</a>
+{% if user.is_superuser %}
+    <div>
+        <p><a href="{% url 'edit_item' item.pk %}"><button type="button">수정하기</button></a></p>
+        <p><a href="{% url 'delete_item' item.pk %}"><button type="button">삭제하기</button></a></p>
+    </div>
+{% endif %}
 {% endblock %}
