@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>상품 목록</h2>
+<ul>
+    {% for item in items %}
+    <li>
+        <a href="{% url 'item_detail' item.pk %}">{{ item.name }}</a>
+        ({{ item.get_category_display }})
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'item_create' %}">상품 추가</a>
+{% endblock %}

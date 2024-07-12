@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ item.name }}</h2>
+<p>카테고리: {{ item.get_category_display }}</p>
+<p>소형 가격: {{ item.price_per_small }}원</p>
+<p>대형 가격: {{ item.price_per_big }}원</p>
+<p>단위 가격: {{ item.price_per_unit }}원</p>
+<a href="{% url 'item_edit' item.pk %}">수정</a>
+{% endblock %}

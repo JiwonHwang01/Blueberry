@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from items.models import Item
 
 # Create your models here.
+
+'''
 class Item(models.Model):
     CATEGORY_CHOICES = [
         ('fruit','과일'),
@@ -16,7 +19,7 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
-
+'''
 class Order(models.Model):
     SIZE_CHOICES = [
         ('small', '소과'),
