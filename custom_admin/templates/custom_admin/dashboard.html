@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<a href="{% url 'home' %}">홈으로 가기</a><br>
 <h2>관리자 대시보드</h2>
 <ul>
     <li><a href="{% url 'admin_item_list' %}">아이템 관리</a></li>

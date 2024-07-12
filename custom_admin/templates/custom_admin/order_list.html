@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<a href="{% url 'home' %}">홈으로 가기</a><br>
+<a href="{% url 'admin_dashboard' %}">관리자 페이지</a>
 <h2>주문서 목록</h2>
 <form method="get">
     <strong>상태 필터:</strong>
