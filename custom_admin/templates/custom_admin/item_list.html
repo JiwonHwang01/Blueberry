@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'home' %}">홈으로 가기</a><br>
+<a href="{% url 'admin_dashboard' %}">관리자 페이지</a>
+<h2>아이템 목록</h2>
+
+<a href="{% url 'create_item' %}"><button type="button">아이템 추가</button></a>
+
+<ul>
+    {% for item in items %}
+    <li>
+        <strong>품목명:</strong><a href="{% url 'item_detail' item.pk %}">{{ item.name }}</a><br>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>주문서 목록</h2>
+<form method="get">
+    <strong>상태 필터:</strong>
+    <select name="status">
+        <option value="">모두</option>
+        <option value="pending">입금 확인 중</option>
+        <option value="preparing">배송 준비중</option>
+        <option value="shipping">배송 중</option>
+        <option value="completed">배송 완료</option>
+    </select>
+    <strong>품목 필터:</strong>
+    <select name="item">
+        <option value="">모두</option>
+        <option value="fruit">블루베리</option>
+        <option value="seed">모종</option>
+    </select>
+    <strong>정렬 기준:</strong>
+    <select name="sort_by">
+        <option value="">주문 일자(최신순)</option>
+        <option value="preferred_delivery_date">배송 희망 일자(가까운순)</option>
+        <option value="total_price">총 가격(높은 순)</option>
+    </select>
+    <button type="submit">적용</button>
+    <a href="{% url 'admin_order_list' %}">
+      <button type="button">초기화</button>
+    </a>
+</form>
+<ul>
+    {% for order in orders %}
+    <li>
+        <strong>주문자:</strong> {{ order.name }}<br>
+        <strong>주문 내용:</strong> {{ order.item }}({{ order.size }})<br>
+        <strong>주문량:</strong> {{ order.quantity }}<br>
+        <strong>주문 금액:</strong> {{ order.total_price }}원<br>
+        <strong>희맹 배송일:</strong> {{ order.preferred_delivery_date }}<br>
+        <form action="{% url 'update_order_status' order.id %}"method="post">
+            {% csrf_token %}
+            <strong>상태:</strong>
+            <select name="status">
+                <option value="{{ order.status }}"selected disabled hidden>{{ order.get_status_display }}</option>
+                <option value="pending">입금 확인 중</option>
+                <option value="preparing">배송 준비중</option>
+                <option value="shipping">배송 중</option>
+                <option value="completed">배송 완료</option>
+            </select>
+            <button type="submit">상태 변경</button>
+        </form>
+        <br>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
