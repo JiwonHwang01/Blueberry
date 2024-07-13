@@ -16,7 +16,20 @@ def admin_required(view_func):
 
 @admin_required
 def admin_dashboard(request):
-    return render(request, 'custom_admin/dashboard.html')
+    total_orders = Order.objects.count()
+    cancel_requests = Order.objects.filter(status='canceling').count()
+    pending_orders = Order.objects.filter(status='pending').count()
+    shipped_orders = Order.objects.filter(status='shipping').count()
+    delivered_orders = Order.objects.filter(status='completed').count()
+
+    context = {
+        'total_orders': total_orders,
+        'cancel_requests': cancel_requests,
+        'pending_orders': pending_orders,
+        'shipped_orders': shipped_orders,
+        'delivered_orders': delivered_orders,
+    }
+    return render(request, 'custom_admin/dashboard.html', context)
 
 @admin_required
 def item_list(request):

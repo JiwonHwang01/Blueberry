@@ -2,8 +2,36 @@
 
 {% block content %}
 <h2>관리자 대시보드</h2>
-<ul>
-    <li><a href="{% url 'admin_item_list' %}">아이템 관리</a></li>
-    <li><a href="{% url 'admin_order_list' %}">주문서 관리</a></li>
-</ul>
+<style>
+    .cancel-requests {
+        color: red;
+    }
+    table, th, td, tr{
+        border: 1px solid;
+        border-collapse: collapse;
+    }
+</style>
+<table>
+    <thead>
+        <tr>
+            <th>총 주문</th>
+            <th>입금 확인 중</th>
+            <th>배송중</th>
+            <th>배송 완료</th>
+            <th>취소 요청</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>{{ total_orders }}</th>
+            <th>{{ pending_orders }}</th>
+            <th>{{ shipped_orders }}</th>
+            <th>{{ delivered_orders }}</th>
+            <th><strong class="cancel-requests">{{ cancel_requests }}</strong></th>
+        </tr>        
+    </tbody>
+</table>
+<li><a href="{% url 'admin_item_list' %}">품목 관리</a></li>
+<li><a href="{% url 'admin_order_list' %}">주문서 관리</a></li>
+
 {% endblock %}
