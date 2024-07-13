@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{% url 'home' %}">홈으로 가기</a><br>
 <a href="{% url 'admin_dashboard' %}">관리자 페이지</a>
 <h2>주문서 목록</h2>
 <form method="get">
@@ -12,6 +11,8 @@
         <option value="preparing">배송 준비중</option>
         <option value="shipping">배송 중</option>
         <option value="completed">배송 완료</option>
+        <option value="canceling">취소 요청</option>
+        <option value="cancelled">취소 완료</option>
     </select>
     <strong>품목 필터:</strong>
     <select name="item">
@@ -47,6 +48,8 @@
                 <option value="preparing">배송 준비중</option>
                 <option value="shipping">배송 중</option>
                 <option value="completed">배송 완료</option>
+                <option value="canceling">취소 요청</option>
+                <option value="cancelled">취소 완료</option>
             </select>
             <button type="submit">상태 변경</button>
         </form>

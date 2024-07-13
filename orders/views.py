@@ -40,6 +40,15 @@ def request_cancel(request, order_id):
         return redirect('order_list')
     return render(request, 'orders/request_cancel.html', {'order': order})
 
+@login_required
+def complete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == "POST":
+        order.status = "completed"
+        order.save()
+        messages.success(request, '감사합니다. 생과 일 때 맛있게 드세요!')
+        return redirect('order_list')
+    return render(request, 'orders/complete_order.html', {'order': order})
 
 def info(request):
     return render(request, 'orders/info.html')

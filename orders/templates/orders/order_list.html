@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{% url 'home' %}">홈으로 가기</a>
 <h2>내 주문 목록</h2>
 <style>
     table, th, td, tr{
@@ -23,7 +22,7 @@
             <th>주소</th>
             <th>배송희망일</th>
             <th>리뷰</th>
-            <th>주문 취소</th>
+            <th>비고</th>
         </tr>
     </thead>
     <tbody>
@@ -49,9 +48,10 @@
                     
                 {% endif %}
             </td>
-            
             <td>
-                {% if order.status == 'pending' %}
+                {% if order.status == 'shipping' %}
+                    <a href="{% url '' order.id %}">구매 확정</a>
+                {% elif order.status == 'pending' %}
                     <a href="{% url 'request_cancel' order.id %}">취소 요청</a>
                 {% endif %}
             </td>

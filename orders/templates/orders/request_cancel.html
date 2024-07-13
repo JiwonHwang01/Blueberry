@@ -9,7 +9,9 @@
     <form method="post">
         {% csrf_token %}
         <button type="submit">예</button>
-        <a href="{% url 'order_list' %}">아니요</a>
+        <a href="{% url 'order_list' %}">
+            <button type="button">아니요</button>
+        </a>
     </form>
 </body>
 </html>
