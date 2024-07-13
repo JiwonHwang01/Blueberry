@@ -3,23 +3,6 @@ from django.contrib.auth.models import User
 from items.models import Item
 
 # Create your models here.
-
-'''
-class Item(models.Model):
-    CATEGORY_CHOICES = [
-        ('fruit','과일'),
-        ('seed','모종'),
-        
-    ]
-    name = models.CharField(max_length=100)
-    category = models.CharField(max_length=20,choices=CATEGORY_CHOICES)
-    price_per_small = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-    price_per_big = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-    price_per_unit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-'''
 class Order(models.Model):
     SIZE_CHOICES = [
         ('small', '소과'),
@@ -32,6 +15,8 @@ class Order(models.Model):
         ('preparing', '배송준비중'),
         ('shipping', '배송중'),
         ('completed', '배송완료'),
+        ('canceling', '취소요청'),
+        ('cancelled', '취소완료'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -48,6 +33,7 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='입금확인중')
     review_written = models.BooleanField(default=False) #TODO
     total_price = models.DecimalField(max_digits=10, decimal_places=0, editable=False)
+    cancel_requested = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if self.item.category == 'fruit':

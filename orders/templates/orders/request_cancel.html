@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>주문 취소 요청</title>
+</head>
+<body>
+    <h1>주문 취소 요청</h1>
+    <p>정말로 이 주문을 취소하시겠습니까?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">예</button>
+        <a href="{% url 'order_list' %}">아니요</a>
+    </form>
+</body>
+</html>

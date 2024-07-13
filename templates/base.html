@@ -5,7 +5,9 @@
 </head>
 <body>
     <header>
-        <h1>블루베리</h1>
+        <a href="{% url 'home' %}">
+            <h1>블루베리</h1>
+        </a>
         
         {% if messages %}
             {% for message in messages %}
