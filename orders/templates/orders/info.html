@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>은혜 블루베리 안내</title>
+</head>
+<body>
+    <h1>무통장 입금 안내</h1>
+    <p>다음 계좌로 입금해 주세요:</p>
+    <ul>
+        <li>
+            계좌번호: <input type="text" id="bank_deposit" value="KB, 940302-00-161476"></input><button onclick="copyText()">텍스트 복사</button>
+            <script>
+                function copyText() {
+                    // 텍스트 영역의 DOM 요소를 가져옵니다.
+                    var textArea = document.getElementById("bank_deposit");
+                    // 텍스트 영역의 내용을 선택합니다.
+                    textArea.select();
+                    // 클립보드에 텍스트를 복사합니다.
+                    navigator.clipboard.writeText(textArea.value)
+                        .then(function() {
+                            // 복사 성공 시 알림
+                            alert("텍스트가 클립보드에 복사되었습니다!");
+                        })
+                        .catch(function(error) {
+                            // 복사 실패 시 오류 처리
+                            console.error("복사 중 오류가 발생했습니다: ", error);
+                        });
+                }
+            </script>
+        
+                
+        </li>
+        <li>예금주: 황지원</li>
+    </ul>
+    <p>문의 사항은 아래 연락처로 문의해 주세요:</p>
+    <ul>
+        <li>전화: 010-5549-7070</li>
+        <li>이메일: cutty82432@gmail.com</li>
+    </ul>
+    <a href="{% url 'order_list' %}">내 주문 확인하기</a><br>
+    <a href="{% url 'home' %}">홈으로 돌아가기</a>
+</body>
+</html>
