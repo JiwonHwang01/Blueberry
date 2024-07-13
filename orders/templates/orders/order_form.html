@@ -2,6 +2,30 @@
 
 {% block content %}
 <h2>주문서 작성</h2>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const itemSelect = document.getElementById('id_item');
+        const sizeSelect = document.getElementById('id_size');
+
+        function updateSizeOptions() {
+            const selectedItem = itemSelect.options[itemSelect.selectedIndex].text;
+            const isFruit = selectedItem.includes('블루베리');
+            const isSeed = selectedItem.includes('모종');
+
+            sizeSelect.innerHTML = '';
+
+            if (isFruit) {
+                sizeSelect.options.add(new Option('소과', 'small'));
+                sizeSelect.options.add(new Option('대과', 'big'));
+            } else if (isSeed) {
+                sizeSelect.options.add(new Option('----', 'none'));
+            }
+        }
+
+        itemSelect.addEventListener('change', updateSizeOptions);
+        updateSizeOptions();
+    });
+</script>
 <form method="post">
     {% csrf_token %}
     {{ form.non_field_errors }}<br>
