@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if user.is_staff %}
+    <p><a href ="{% url 'admin_dashboard' %}">관리자 페이지</a></p>
+{% endif %}
 <h2>Welcome to 블루베리!</h2>
-
 {% if user.is_authenticated %}
     <p><a href ="{% url 'create_order' %}">주문하기</a></p>
     <p><a href ="{% url 'order_list' %}">내 주문 확인하기</a></p>
