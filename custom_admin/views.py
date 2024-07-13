@@ -1,19 +1,29 @@
-from unicodedata import category
 from django.shortcuts import render
-
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from items.forms import ItemForm
 from orders.models import Order
 from items.models import Item
 from .forms import OrderStatusForm
 
+def admin_required(view_func):
+    def wrapped_view_func(request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, "관리자만 권한이 있는 페이지입니다.")
+            return redirect('home')
+        return view_func(request, *args, **kwargs)
+    return wrapped_view_func
+
+@admin_required
 def admin_dashboard(request):
     return render(request, 'custom_admin/dashboard.html')
 
+@admin_required
 def item_list(request):
     items = Item.objects.all()
     return render(request, 'custom_admin/item_list.html', {'items': items})
 
+@admin_required
 def create_item(request):
     if request.method == 'POST':
         form = ItemForm(request.POST)
@@ -24,6 +34,7 @@ def create_item(request):
         form = ItemForm()
     return render(request, 'custom_admin/item_form.html', {'form': form})
 
+@admin_required
 def edit_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     if request.method == 'POST':
@@ -35,6 +46,7 @@ def edit_item(request, item_id):
         form = ItemForm(instance=item)
     return render(request, 'custom_admin/item_form.html', {'form': form})
 
+@admin_required
 def delete_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     
@@ -44,6 +56,7 @@ def delete_item(request, item_id):
     
     return render(request, 'custom_admin/delete_item.html', {'item': item})
 
+@admin_required
 def order_list(request):
     orders = Order.objects.all()
 
@@ -68,6 +81,7 @@ def order_list(request):
 
     return render(request, 'custom_admin/order_list.html', {'orders': orders})
 
+@admin_required
 def update_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
