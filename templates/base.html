@@ -1,14 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}블루베리{% endblock %}</title>
+    <style>
+        /* 기본 스타일 */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #804c7d;
+            color: #fff;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            right: -250px;
+            height: 100%;
+            width: 50%;
+            background-color: #b081ae;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: right 0.3s ease;
+            padding-top: 50px;
+        } 
+        
+        nav a {
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+
+        .hamburger div {
+            width: 100%;
+            height: 3px;
+            background-color: #fff;
+        }
+
+        .nav-active {
+            right: 0; /* 햄버거 메뉴 활성화 시 표시 */
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            background-color: #804c7d;
+        }
+    </style>
 </head>
-<body>
+<body onclick="closeMenu(event)">
     <header>
         <a href="{% url 'home' %}">
             <h1>블루베리</h1>
         </a>
-        
+        <div class="hamburger" onclick="toggleMenu(event)">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
         {% if messages %}
             {% for message in messages %}
                 <script>
@@ -18,20 +102,42 @@
         {% endif %}
             
         
+        
+    </header>
+    <nav id="navMenu" onclick="event.stopPropagation()">
+        <!-- 네비게이션 메뉴 -->
+        <div class="nav-header">
+            <a href="{% url 'home' %}">Home</a>
+            <div class="hamburger" onclick="toggleMenu(event)">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
         {% if user.is_authenticated %}
-            <p>Welcome, {{ user.username }}!</p>
             <a href="{% url 'logout' %}">로그아웃</a>
         {% else %}
             <a href="{% url 'signup' %}">가입</a>
             <a href="{% url 'login' %}">로그인</a>
         {% endif %}
-    </header>
-    <nav>
-        <!-- 네비게이션 메뉴 -->
     </nav>
     <main>
+        <p>Welcome, {{ user.username }}!</p>
         {% block content %}
         {% endblock %}
     </main>
+    <script>
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const nav = document.getElementById('navMenu');
+            nav.classList.toggle('nav-active');
+        }
+        function closeMenu(event) {
+            const nav = document.getElementById('navMenu');
+            if (nav.classList.contains('nav-active')) {
+                nav.classList.remove('nav-active');
+            }
+        }
+    </script>
 </body>
 </html>
