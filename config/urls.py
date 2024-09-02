@@ -18,15 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('custom-admin/', include('custom_admin.urls')),
-    path('accounts/', include('accounts.urls')),
+    path('api/auth/', include('accounts.urls')),
     path('orders/', include('orders.urls')),
     path('items/', include('items.urls')),
     path('reviews/', include('reviews.urls')),
-    path('', TemplateView.as_view(template_name="frontend/index.html")),
-    #path('', include('main.urls')),
+    #path('', TemplateView.as_view(template_name="frontend/index.html")),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('', include('main.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
