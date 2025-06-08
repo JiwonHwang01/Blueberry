@@ -1,37 +1,177 @@
 {% extends 'base.html' %}
 
+{% block title %}Blueberry - 관리자 대시보드{% endblock %}
+
 {% block content %}
-<h2>관리자 대시보드</h2>
+<div class="admin-dashboard">
+    <h1 class="dashboard-title">관리자 대시보드</h1>
+
+    <!-- 통계 섹션 -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <a href="{% url 'admin_order_list' %}?status=pending" class="stat-card pending">
+                <h3>입금 확인 중</h3>
+                <p class="stat-number">{{ pending_orders }}</p>
+            </a>
+            <a href="{% url 'admin_order_list' %}?status=shipping" class="stat-card">
+                <h3>배송 중</h3>
+                <p class="stat-number">{{ shipped_orders }}</p>
+            </a>
+            <a href="{% url 'admin_order_list' %}?status=completed" class="stat-card">
+                <h3>배송 완료</h3>
+                <p class="stat-number">{{ delivered_orders }}</p>
+            </a>
+            <a href="{% url 'admin_order_list' %}?status=canceling" class="stat-card cancelled">
+                <h3>취소 요청</h3>
+                <p class="stat-number">{{ cancel_requests }}</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- 주문 관리 섹션 -->
+    <section class="admin-section">
+        <h2>주문 관리</h2>
+        <div class="section-content">
+            <div class="admin-menu">
+                <a href="{% url 'admin_order_list' %}" class="btn btn-primary">주문서 관리</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 상품 관리 섹션 -->
+    <section class="admin-section">
+        <h2>상품 관리</h2>
+        <div class="section-content">
+            <div class="admin-menu">
+                <a href="{% url 'admin:items_item_add' %}" class="btn btn-primary">새 품목 등록</a>
+                <a href="{% url 'admin:items_item_changelist' %}" class="btn btn-primary">품목 수정</a>
+            </div>
+        </div>
+    </section>
+</div>
+
 <style>
-    .cancel-requests {
-        color: red;
+    .admin-dashboard {
+        padding: 1rem;
     }
-    table, th, td, tr{
-        border: 1px solid;
-        border-collapse: collapse;
+
+    .dashboard-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+
+    /* 통계 섹션 */
+    .stats-section {
+        margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .stat-card.pending .stat-number {
+        color: #ff9800;
+    }
+
+    .stat-card.cancelled .stat-number {
+        color: #f44336;
+    }
+
+    .stat-card h3 {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-number {
+        color: #1a73e8;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    /* 섹션 공통 스타일 */
+    .admin-section {
+        margin-bottom: 2rem;
+    }
+
+    .admin-section h2 {
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #1a73e8;
+    }
+
+    .section-content {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 관리 메뉴 */
+    .admin-menu {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* 버튼 스타일 */
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: #1a73e8;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #1a73e8;
+        border: 1px solid #1a73e8;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .inline-form {
+        display: inline;
+    }
+
+    /* 태블릿 */
+    @media screen and (min-width: 768px) {
+        .admin-dashboard {
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
     }
 </style>
-<table>
-    <thead>
-        <tr>
-            <th>총 주문</th>
-            <th>입금 확인 중</th>
-            <th>배송중</th>
-            <th>배송 완료</th>
-            <th>취소 요청</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>{{ total_orders }}</th>
-            <th>{{ pending_orders }}</th>
-            <th>{{ shipped_orders }}</th>
-            <th>{{ delivered_orders }}</th>
-            <th><strong class="cancel-requests">{{ cancel_requests }}</strong></th>
-        </tr>        
-    </tbody>
-</table>
-<li><a href="{% url 'admin_item_list' %}">품목 관리</a></li>
-<li><a href="{% url 'admin_order_list' %}">주문서 관리</a></li>
-
 {% endblock %}

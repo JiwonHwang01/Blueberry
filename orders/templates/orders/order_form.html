@@ -1,105 +1,355 @@
 {% extends 'base.html' %}
 
+{% block title %}Blueberry - 주문서 작성{% endblock %}
+
 {% block content %}
-<h2>주문서 작성</h2>
+<div class="order-form-page">
+    <div class="page-header">
+        <h1 class="page-title">주문서 작성</h1>
+    </div>
+
+    <div class="order-form-container">
+        <form method="post" class="order-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- 주문 정보 섹션 -->
+            <section class="form-section">
+                <h2 class="section-title">주문 정보</h2>
+                <div class="form-group">
+                    <label for="id_item">품목</label>
+                    {{ form.item }}
+                    {% if form.item.errors %}
+                    <div class="error-message">{{ form.item.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_size">사이즈</label>
+                    {{ form.size }}
+                    {% if form.size.errors %}
+                    <div class="error-message">{{ form.size.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_quantity">수량</label>
+                    {{ form.quantity }}
+                    {% if form.quantity.errors %}
+                    <div class="error-message">{{ form.quantity.errors }}</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- 배송 정보 섹션 -->
+            <section class="form-section">
+                <h2 class="section-title">배송 정보</h2>
+                <div class="form-group">
+                    <label for="id_name">수령인</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="error-message">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_contact">연락처</label>
+                    {{ form.contact }}
+                    {% if form.contact.errors %}
+                    <div class="error-message">{{ form.contact.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="postcode">우편번호</label>
+                    <div class="address-input-group">
+                        <input type="text" id="postcode" name="postcode" readonly>
+                        <button type="button" class="btn btn-secondary" onclick="execDaumPostcode()">주소 검색</button>
+                    </div>
+                    {% if form.postcode.errors %}
+                    <div class="error-message">{{ form.postcode.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="address">기본주소</label>
+                    <input type="text" id="address" name="address" readonly>
+                    {% if form.address.errors %}
+                    <div class="error-message">{{ form.address.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="detailAddress">상세주소</label>
+                    <input type="text" id="detailAddress" name="detail_address" placeholder="상세주소를 입력해주세요">
+                </div>
+            </section>
+
+            <!-- 배송 희망일 섹션 -->
+            <section class="form-section">
+                <h2 class="section-title">배송 희망일</h2>
+                <div class="form-group">
+                    <label for="id_preferred_delivery_date">희망 배송일</label>
+                    {{ form.preferred_delivery_date }}
+                    {% if form.preferred_delivery_date.errors %}
+                    <div class="error-message">{{ form.preferred_delivery_date.errors }}</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- 입금자 정보 섹션 -->
+            <section class="form-section">
+                <h2 class="section-title">입금자 정보</h2>
+                <div class="form-group">
+                    <label for="id_depositor_name">입금자명</label>
+                    {{ form.depositor_name }}
+                    {% if form.depositor_name.errors %}
+                    <div class="error-message">{{ form.depositor_name.errors }}</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">주문하기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const itemSelect = document.getElementById('id_item');
         const sizeSelect = document.getElementById('id_size');
 
         function updateSizeOptions() {
-            const selectedItem = itemSelect.options[itemSelect.selectedIndex].text;
-            const isFruit = selectedItem.includes('블루베리');
-            const isSeed = selectedItem.includes('모종');
+            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+            const selectedText = selectedOption.text;
+            const selectedValue = selectedOption.value;
+            
+            console.log('Selected text:', selectedText);
+            console.log('Selected value:', selectedValue);
 
-            sizeSelect.innerHTML = '';
+            // 기존 옵션 제거
+            while (sizeSelect.options.length > 0) {
+                sizeSelect.remove(0);
+            }
 
-            if (isFruit) {
-                sizeSelect.options.add(new Option('소과', 'small'));
-                sizeSelect.options.add(new Option('대과', 'big'));
-            } else if (isSeed) {
-                sizeSelect.options.add(new Option('----', 'none'));
+            // 텍스트로 판별
+            if (selectedValue == 1) {
+                console.log('Adding fruit options');
+                sizeSelect.add(new Option('소과', 'small'));
+                sizeSelect.add(new Option('대과', 'big'));
+            } else if (selectedValue == 2) {
+                console.log('Adding seed option');
+                sizeSelect.add(new Option('----', 'none'));
             }
         }
 
-        itemSelect.addEventListener('change', updateSizeOptions);
-        updateSizeOptions();
+        if (itemSelect) {
+            itemSelect.addEventListener('change', updateSizeOptions);
+            updateSizeOptions();  // 초기 옵션 설정
+        }
+
+        // 배송 희망일 설정
+        const dateInput = document.querySelector('input[type="date"]');
+        if (dateInput) {
+            const today = new Date();
+            const limitDay = new Date();
+            limitDay.setDate(today.getDate() + 30);
+
+            // 날짜 형식 변환 (YYYY-MM-DD)
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            dateInput.setAttribute('min', formatDate(today));
+            dateInput.setAttribute('max', formatDate(limitDay));
+        }
     });
-</script>
-<form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}<br>
-    {{ form.item.errors }} {{ form.item.label }}: {{ form.item }}<br>
-    {{ form.size.errors }} {{ form.size.label }}: {{ form.size }}
-    {{ form.quantity.errors }} {{ form.quantity.label }}: {{ form.quantity }}<br>
-    {{ form.name.errors }} {{ form.name.label }}: {{ form.name }}<br>
-    {{ form.contact.errors }} {{ form.contact.label }}: {{ form.contact }}<br>
-    {{ form.postcode.errors }} {{ form.postcode.label }}: <input type="text" id="postcode" name="postcode" onclick="execDaumPostcode()" readonly><br>
-    {{ form.address.errors }} {{ form.address.label }}: <input type="text" id="address" name="address" onclick="execDaumPostcode()" readonly>
-    <input type="text" id="detailAddress" name="detail_address" placeholder="(상세주소)"><br>
-    
-    {{ form.preferred_delivery_date.errors }} {{ form.preferred_delivery_date.label }}: {{ form.preferred_delivery_date }}<br>
-    {{ form.depositor_name.errors }} {{ form.depositor_name.label }}: {{ form.depositor_name }}<br>
-    
-    
-    <button type="submit">주문하기</button>
-</form>
-<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
-<script>
+
+    // 주소 검색 함수
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
-                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-                var addr = ''; // 주소 변수
-                var extraAddr = ''; // 참고항목 변수
+                let addr = '';
+                let extraAddr = '';
 
-                // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                // 도로명 주소 또는 지번 주소 선택
+                if (data.userSelectedType === 'R') {
                     addr = data.roadAddress;
-                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                } else {
                     addr = data.jibunAddress;
                 }
 
-                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-                if(data.userSelectedType === 'R'){
-                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                // 도로명 주소인 경우 추가 정보 처리
+                if (data.userSelectedType === 'R') {
+                    if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
                         extraAddr += data.bname;
                     }
-                    // 건물명이 있고, 공동주택일 경우 추가한다.
-                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                    if (data.buildingName !== '' && data.apartment === 'Y') {
                         extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
                     }
-                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-                    if(extraAddr !== ''){
+                    if (extraAddr !== '') {
                         addr += ' (' + extraAddr + ')';
-                        
                     }
-                } else {
-                    document.getElementById("extraAddress").value = '';
                 }
 
-                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                // 주소 정보 입력
                 document.getElementById('postcode').value = data.zonecode;
-                document.getElementById("address").value = addr;
-
-                // 커서를 상세주소 필드로 이동한다.
-                document.getElementById("detailAddress").focus();
+                document.getElementById('address').value = addr;
+                
+                // 상세주소 입력 필드로 포커스
+                const detailAddress = document.getElementById('detailAddress');
+                if (detailAddress) {
+                    detailAddress.focus();
+                }
             }
         }).open();
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var dateInput = document.querySelector('input[type="date"]');
-        var today = new Date().toISOString().split('T')[0];
-        var limitDay = new Date();
-        limitDay.setDate(limitDay.getDate() + 30);  // limit_day 설정 (예: 30일)
-        var limitDate = limitDay.toISOString().split('T')[0];
-
-        dateInput.setAttribute('min', today);
-        dateInput.setAttribute('max', limitDate);
-    });
 </script>
+
+<style>
+    .order-form-page {
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .page-title {
+        color: #333;
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .order-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-section {
+        margin-bottom: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+    }
+
+    .address-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .address-input-group input {
+        flex: 1;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: #1a73e8;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1557b0;
+    }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #1a73e8;
+        border: 1px solid #1a73e8;
+    }
+
+    .btn-secondary:hover {
+        background: #e8f0fe;
+    }
+
+    @media screen and (max-width: 768px) {
+        .order-form-page {
+            padding: 0.5rem;
+        }
+
+        .order-form-container {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+    }
+</style>
 {% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>주문 상세 정보</h2>
+    <div class="order-detail">
+        <div class="order-section">
+            <h3>주문 정보</h3>
+            <p><strong>주문번호:</strong> {{ order.order_number }}</p>
+            <p><strong>주문상태:</strong> {{ order.get_status_display }}</p>
+            <p><strong>주문일자:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
+        </div>
+
+        <div class="order-section">
+            <h3>상품 정보</h3>
+            <p><strong>상품명:</strong> {{ order.item.name }}</p>
+            <p><strong>크기:</strong> {{ order.get_size_display }}</p>
+            <p><strong>수량:</strong> {{ order.quantity }}개</p>
+            <p><strong>총 금액:</strong> {{ order.total_price }}원</p>
+        </div>
+
+        <div class="order-section">
+            <h3>배송 정보</h3>
+            <p><strong>수령인:</strong> {{ order.name }}</p>
+            <p><strong>연락처:</strong> {{ order.contact }}</p>
+            <p><strong>우편번호:</strong> {{ order.postcode }}</p>
+            <p><strong>주소:</strong> {{ order.address }}</p>
+            <p><strong>상세주소:</strong> {{ order.detail_address }}</p>
+            <p><strong>배송희망일:</strong> {{ order.preferred_delivery_date }}</p>
+        </div>
+
+        <div class="order-section">
+            <h3>결제 정보</h3>
+            <p><strong>입금자명:</strong> {{ order.depositor_name }}</p>
+        </div>
+
+        <div class="order-actions">
+            <a href="{% url 'order_list' %}" class="btn btn-secondary">목록으로</a>
+            {% if order.status == 'completed' and not order.review_written %}
+                <a href="{% url 'review_create' order.id %}" class="btn btn-success">리뷰작성</a>
+            {% endif %}
+            {% if order.status == 'pending' and not order.cancel_requested %}
+                <a href="{% url 'request_cancel' order.order_number %}" class="btn btn-danger">취소요청</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    .order-detail {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .order-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    .order-section:last-child {
+        border-bottom: none;
+    }
+    .order-section h3 {
+        color: #804c7d;
+        margin-bottom: 1rem;
+    }
+    .order-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+    .btn-success {
+        background-color: #28a745;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+    }
+</style>
+{% endblock %} 

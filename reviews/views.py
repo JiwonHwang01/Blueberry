@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Review
 from .forms import ReviewForm, ReviewFilterForm
 from orders.models import Order
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 
 # Create your views here.
 def review_list(request):
@@ -44,3 +47,20 @@ def review_create(request, order_id):
     else:
         form = ReviewForm(initial={'item':order.item, 'size':order.size})
     return render(request, 'reviews/review_form.html', {'form': form, 'order':order})
+
+# API Views
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def review_list_api(request):
+    reviews = Review.objects.all()
+    serializer = ReviewSerializer(reviews, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def review_create_api(request):
+    serializer = ReviewSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

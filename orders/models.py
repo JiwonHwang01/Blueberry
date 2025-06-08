@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from items.models import Item
+from django.utils.crypto import get_random_string
+from datetime import datetime
+from django.utils import timezone
 
 # Create your models here.
 class Order(models.Model):
@@ -34,8 +37,21 @@ class Order(models.Model):
     review_written = models.BooleanField(default=False) #TODO
     total_price = models.DecimalField(max_digits=10, decimal_places=0, editable=False)
     cancel_requested = models.BooleanField(default=True)
+    order_number = models.CharField(max_length=20, unique=True, editable=False, null=True)
+    created_at = models.DateTimeField(default=timezone.now, null=True)
 
     def save(self, *args, **kwargs):
+        if not self.order_number:
+            # 주문일자 + 랜덤 4자리 숫자 생성
+            date_str = datetime.now().strftime('%Y%m%d')
+            random_num = get_random_string(4, allowed_chars='0123456789')
+            self.order_number = f"{date_str}{random_num}"
+            
+            # 중복 체크
+            while Order.objects.filter(order_number=self.order_number).exists():
+                random_num = get_random_string(4, allowed_chars='0123456789')
+                self.order_number = f"{date_str}{random_num}"
+
         if self.item.category == 'fruit':
             if self.size == 'small':
                 self.total_price = self.quantity * self.item.price_per_small
@@ -46,4 +62,4 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.user.username} - {self.item.name} - {self.status}'
+        return f'{self.order_number} - {self.user.username} - {self.item.name} - {self.status}'

@@ -1,10 +1,280 @@
 {% extends 'base.html' %}
 
+{% block title %}Blueberry - 회원가입{% endblock %}
+
 {% block content %}
-<h2>회원가입</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">회원가입</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="signup-card">
+                <h2 class="text-center mb-4">회원가입</h2>
+                <form method="post" class="signup-form" id="signupForm" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field.errors }}
+                        {{ field }}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="signup-btn">가입하기</button>
+                </form>
+                <div class="login-link">
+                    <p>이미 계정이 있으신가요? <a href="{% url 'login' %}">로그인</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .signup-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .signup-form {
+        margin-top: 1.0rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        border-color: #1a73e8;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+
+    .form-group input.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .form-group .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .signup-btn {
+        width: 100%;
+        padding: 1rem;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .signup-btn:hover {
+        background-color: #1557b0;
+    }
+
+    .signup-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.0rem;
+        border-top: 1px solid #e1e1e1;
+    }
+
+    .login-link a {
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .signup-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signupForm');
+    const inputs = form.querySelectorAll('input');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    // 실시간 유효성 검사
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            validateInput(this);
+            updateSubmitButton();
+        });
+
+        input.addEventListener('blur', function() {
+            validateInput(this);
+            updateSubmitButton();
+        });
+    });
+
+    // 폼 제출 전 최종 검증
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!validateInput(input)) {
+                isValid = false;
+            }
+        });
+
+        if (isValid) {
+            form.submit();
+        }
+    });
+
+    function validateInput(input) {
+        const feedback = input.parentElement.querySelector('.invalid-feedback');
+        let isValid = true;
+        let errorMessage = '';
+
+        // 필수 입력 검사
+        if (input.required && !input.value.trim()) {
+            isValid = false;
+            errorMessage = '이 필드는 필수입니다.';
+        }
+
+        // 사용자 이름 검사
+        if (input.id === 'id_username') {
+            if (input.value.length < 3) {
+                isValid = false;
+                errorMessage = '사용자 이름은 3자 이상이어야 합니다.';
+            } else if (input.value.length > 150) {
+                isValid = false;
+                errorMessage = '사용자 이름은 150자 이하여야 합니다.';
+            } else if (!/^[\w.@+-]+$/.test(input.value)) {
+                isValid = false;
+                errorMessage = '사용자 이름은 문자, 숫자, @/./+/-/_ 만 사용할 수 있습니다.';
+            } else {
+                // 중복 체크
+                checkUsernameAvailability(input.value).then(exists => {
+                    if (exists) {
+                        input.classList.add('is-invalid');
+                        feedback.textContent = '이미 사용 중인 사용자 이름입니다.';
+                        isValid = false;
+                    }
+                });
+            }
+        }
+
+        // 이메일 형식 검사
+        if (input.type === 'email' && input.value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(input.value)) {
+                isValid = false;
+                errorMessage = '유효한 이메일 주소를 입력해주세요.';
+            }
+        }
+
+        // 비밀번호 검사
+        if (input.type === 'password') {
+            if (input.value.length < 8) {
+                isValid = false;
+                errorMessage = '비밀번호는 8자 이상이어야 합니다.';
+            }
+        }
+
+        // 비밀번호 확인 검사
+        if (input.id === 'id_password2' && input.value) {
+            const password1 = document.getElementById('id_password1');
+            if (input.value !== password1.value) {
+                isValid = false;
+                errorMessage = '비밀번호가 일치하지 않습니다.';
+            }
+        }
+
+        // UI 업데이트
+        if (!isValid) {
+            input.classList.add('is-invalid');
+            feedback.textContent = errorMessage;
+        } else {
+            input.classList.remove('is-invalid');
+            feedback.textContent = '';
+        }
+
+        return isValid;
+    }
+
+    // 사용자 이름 중복 체크 함수
+    async function checkUsernameAvailability(username) {
+        try {
+            const response = await fetch(`/accounts/check-username/?username=${encodeURIComponent(username)}`);
+            const data = await response.json();
+            return data.exists;
+        } catch (error) {
+            console.error('Error checking username:', error);
+            return false;
+        }
+    }
+
+    // 사용자 이름 입력 시 디바운스 처리
+    let usernameTimeout;
+    const usernameInput = document.getElementById('id_username');
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            clearTimeout(usernameTimeout);
+            usernameTimeout = setTimeout(() => {
+                if (this.value.length >= 3) {
+                    checkUsernameAvailability(this.value).then(exists => {
+                        const feedback = this.parentElement.querySelector('.invalid-feedback');
+                        if (exists) {
+                            this.classList.add('is-invalid');
+                            feedback.textContent = '이미 사용 중인 사용자 이름입니다.';
+                        } else {
+                            this.classList.remove('is-invalid');
+                            feedback.textContent = '';
+                        }
+                    });
+                }
+            }, 500); // 500ms 디바운스
+        });
+    }
+
+    function updateSubmitButton() {
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!validateInput(input)) {
+                isValid = false;
+            }
+        });
+        submitBtn.disabled = !isValid;
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

@@ -1,13 +1,165 @@
 {% extends 'base.html' %}
 
+{% block title %}Blueberry - 상품 목록{% endblock %}
+
 {% block content %}
-<h2>상품 목록</h2>
-<ul>
-    {% for item in items %}
-    <li>
-        <a href="{% url 'item_detail' item.pk %}">{{ item.name }}</a>
-        ({{ item.get_category_display }})
-    </li>
-    {% endfor %}
-</ul>
+<div class="items-container">
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <h1>신선한 블루베리</h1>
+        <p>직접 재배한 프리미엄 블루베리를 만나보세요</p>
+    </section>
+
+    <!-- 상품 목록 -->
+    <section class="items-section">
+        <div class="items-grid">
+            {% for item in items %}
+            <div class="item-card">
+                {% if item.image %}
+                <div class="item-image">
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                </div>
+                {% endif %}
+                <div class="item-info">
+                    <h3>{{ item.name }}</h3>
+                    <p class="item-description">{{ item.description|truncatechars:100 }}</p>
+                    <a href="{% url 'item_detail' item.pk %}" class="btn btn-secondary">자세히 보기</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<style>
+    /* 히어로 섹션 */
+    .hero {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/images/blueberry-hero.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        margin: -1rem -1rem 2rem -1rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* 상품 섹션 */
+    .items-section {
+        padding: 1rem 0;
+    }
+
+    /* 상품 그리드 */
+    .items-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    /* 상품 카드 */
+    .item-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .item-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .item-image {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-info {
+        padding: 1rem;
+    }
+
+    .item-info h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    .item-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #1a73e8;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    /* 버튼 스타일 */
+    .btn-secondary {
+        background-color: #f8f9fa;
+        color: #1a73e8;
+        border: 1px solid #1a73e8;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+        background-color: #1a73e8;
+        color: white;
+    }
+
+    /* 태블릿 */
+    @media screen and (min-width: 768px) {
+        .hero {
+            padding: 4rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .items-grid {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 0;
+        }
+    }
+
+    /* 데스크톱 */
+    @media screen and (min-width: 1024px) {
+        .hero {
+            padding: 5rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+        }
+
+        .items-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>
 {% endblock %}

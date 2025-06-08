@@ -1,15 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>{{ item.name }}</h2>
-<p>카테고리: {{ item.get_category_display }}</p>
-<p>소형 가격: {{ item.price_per_small }}원</p>
-<p>대형 가격: {{ item.price_per_big }}원</p>
-<p>단위 가격: {{ item.price_per_unit }}원</p>
-{% if user.is_superuser %}
-    <div>
-        <p><a href="{% url 'edit_item' item.pk %}"><button type="button">수정하기</button></a></p>
-        <p><a href="{% url 'delete_item' item.pk %}"><button type="button">삭제하기</button></a></p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="card-title mb-3">{{ item.name }}</h2>
+                    <p class="text-muted mb-4">카테고리: {{ item.get_category_display }}</p>
+                    
+                    <div class="price-info mb-4">
+                        <h4 class="text-success mb-3">가격 정보</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>소형 가격:</span>
+                            <span class="fw-bold">{{ item.price_per_small }}원</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>대형 가격:</span>
+                            <span class="fw-bold">{{ item.price_per_big }}원</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>단위 가격:</span>
+                            <span class="fw-bold">{{ item.price_per_unit }}원</span>
+                        </div>
+                    </div>
+
+                    {% if user.is_superuser %}
+                    <div class="admin-actions mt-4">
+                        <a href="{% url 'edit_item' item.pk %}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-edit me-2"></i>수정하기
+                        </a>
+                        <a href="{% url 'delete_item' item.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-2"></i>삭제하기
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="order-action mt-4">
+                        <a href="{% url 'order_form' item.pk %}" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>주문하기
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-{% endif %}
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .btn {
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 500;
+    }
+    .btn-success {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+    .btn-success:hover {
+        background-color: #45a049;
+        border-color: #45a049;
+    }
+    .price-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .mt-4 {
+        display: flex;
+        margin-top: 1rem;
+        justify-content: center;
+        gap: 1rem;
+    }
+</style>
 {% endblock %}

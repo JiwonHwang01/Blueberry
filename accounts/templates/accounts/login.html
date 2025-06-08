@@ -1,10 +1,116 @@
 {% extends 'base.html' %}
 
+{% block title %}Blueberry - 로그인{% endblock %}
+
 {% block content %}
-<h2>로그인</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">로그인</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="login-card">
+                <h2 class="text-center mb-4">로그인</h2>
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="login-btn">로그인</button>
+                </form>
+                <div class="signup-link">
+                    <p>계정이 없으신가요? <a href="{% url 'signup' %}">회원가입</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-form {
+        margin-top: 1.0rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        border-color: #1a73e8;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+
+    .form-group .errorlist {
+        color: #dc3545;
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.875rem;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1rem;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .login-btn:hover {
+        background-color: #1557b0;
+    }
+
+    .signup-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.0rem;
+        border-top: 1px solid #e1e1e1;
+    }
+
+    .signup-link a {
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .signup-link a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .login-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
 {% endblock %}

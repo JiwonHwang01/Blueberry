@@ -7,6 +7,7 @@ urlpatterns = [
     path('success/', order_success, name='order_success'),
     path('list/', order_list, name='order_list'),
     path('info/', views.info, name='info'),
-    path('request-cancel/<int:order_id>/', views.request_cancel, name='request_cancel'),
-    path('complete-order/<int:order_id>/', views.complete_order, name='complete_order'),
+    path('request-cancel/<str:order_number>/', views.request_cancel, name='request_cancel'),
+    path('complete-order/<str:order_number>/', views.complete_order, name='complete_order'),
+    path('detail/<str:order_number>/', views.order_detail, name='order_detail'),
 ]

@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import AllowAny
 
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,43 +37,37 @@ def get_csrf_token(request):
     print(csrf_token)
     return JsonResponse({'csrfToken': csrf_token})
 
-
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.csrf import csrf_exempt
+def check_username(request):
+    username = request.GET.get('username', '')
+    exists = User.objects.filter(username=username).exists()
+    return JsonResponse({'exists': exists})
 
 @csrf_exempt
-@api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
+    if request.method == 'GET':
+        form = CustomUserCreationForm()
+        return render(request, 'accounts/signup.html', {'form': form})
+    
     form = CustomUserCreationForm(request.POST)
     if form.is_valid():
         user = form.save()
         login(request, user)
-        user_data = {
-            "username": user.username,
-            "email": user.email
-        }
-        print("asdasdasd")
-        return JsonResponse({'success': True, 'user': user_data})
+        return redirect('home')  # 홈페이지로 리다이렉트
     else:
-        return JsonResponse({'success': False, 'errors': form.errors})
+        return render(request, 'accounts/signup.html', {
+            'form': form,
+            'errors': form.errors
+        })
     
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=json.loads(request.body))
-        
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            user_data = {
-                "username": user.username,
-                "email": user.email
-            }
-            return JsonResponse({'success': True, 'user': user_data})  # 메인 페이지로 리디렉션
-        else:
-            print("Error",form.errors)
+            return redirect('home')  # 메인 페이지로 리디렉션
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
@@ -85,7 +81,7 @@ def logout_view(request):
 def get_user_info(request):
     user = request.user
     return Response({
-        'pk': user.pk,
+        #'pk': user.pk,
         'email': user.email,
         'username': user.username,
     })
