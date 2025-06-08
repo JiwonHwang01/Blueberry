@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -21,10 +21,14 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           if_key_exists: replace
+          debug: true  # 디버그 모드 활성화
 
       - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          ssh ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Deploying to EC2 host: $EC2_HOST"
+          ssh -v ubuntu@$EC2_HOST '
             cd /home/ubuntu/blueberry &&
             git pull origin main &&
             source venv/bin/activate &&
