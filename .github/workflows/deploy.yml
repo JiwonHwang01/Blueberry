@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -35,4 +35,4 @@ jobs:
             pip install -r requirements.txt &&
             python manage.py migrate &&
             python manage.py collectstatic --noinput &&
-            sudo systemctl restart blueberry' 
+            sudo systemctl restart blueberry'
