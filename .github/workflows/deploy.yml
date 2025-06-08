@@ -68,7 +68,9 @@ jobs:
             Group=www-data
             WorkingDirectory=/home/ubuntu/blueberry
             Environment="PATH=/home/ubuntu/blueberry/venv/bin"
-            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 2 --bind unix:/home/ubuntu/blueberry/blueberry.sock blueberry.wsgi:application
+            Environment="DJANGO_SETTINGS_MODULE=config.settings"
+            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 2 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application
+            Restart=always
 
             [Install]
             WantedBy=multi-user.target
@@ -93,6 +95,10 @@ jobs:
                 location / {
                     include proxy_params;
                     proxy_pass http://unix:/home/ubuntu/blueberry/blueberry.sock;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
                 }
             }
             EOF
@@ -106,6 +112,7 @@ jobs:
             sudo chmod -R 755 /home/ubuntu/blueberry
 
             # 서비스 시작
+            sudo systemctl daemon-reload
             sudo systemctl start blueberry
             sudo systemctl enable blueberry
             sudo systemctl restart nginx
@@ -130,4 +137,6 @@ jobs:
             pip install Pillow &&
             python manage.py migrate &&
             python manage.py collectstatic --noinput &&
-            sudo systemctl restart blueberry'
+            sudo systemctl restart blueberry &&
+            sudo systemctl status blueberry &&
+            sudo journalctl -u blueberry -n 50'
