@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from .models import Item
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .serializers import ItemSerializer
 
 def item_list(request):
     items = Item.objects.all()
