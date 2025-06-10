@@ -21,7 +21,7 @@ def item_list_api(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def item_detail_api(request, pk):
     item = get_object_or_404(Item, pk=pk)
     serializer = ItemSerializer(item)

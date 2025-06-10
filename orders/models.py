@@ -8,8 +8,8 @@ from django.utils import timezone
 # Create your models here.
 class Order(models.Model):
     SIZE_CHOICES = [
-        ('small', '소과'),
-        ('big', '대과'),
+        ('small', '소과1kg'),
+        ('big', '대과1kg'),
         ('none', '모종(해당없음)'),
     ]
     
