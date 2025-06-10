@@ -7,16 +7,16 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ['username', 'password1', 'password2']
         labels = {
-            'username': '사용자 이름',
+            'username': '사용자 아이디',
         }
         help_texts = {
-            'username': '사용자 이름은 고유해야 합니다.',
+            'username': '사용자 아이디는 고유해야 합니다.',
             'password1': '비밀번호는 최소 8자 이상이어야 하며, 흔하지 않아야 합니다.',
             'password2': '비밀번호를 한 번 더 입력하여 확인하세요.',
         }
         error_messages = {
             'username': {
-                'unique': '이미 사용 중인 사용자 이름입니다. 다른 이름을 사용해 주세요.',
+                'unique': '이미 사용 중인 사용자 아이디입니다. 다른 아이디를 사용해 주세요.',
             },
             
             

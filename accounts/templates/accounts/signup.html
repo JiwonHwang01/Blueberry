@@ -169,23 +169,23 @@ document.addEventListener('DOMContentLoaded', function() {
             errorMessage = '이 필드는 필수입니다.';
         }
 
-        // 사용자 이름 검사
+        // 사용자 아이디 검사
         if (input.id === 'id_username') {
             if (input.value.length < 3) {
                 isValid = false;
-                errorMessage = '사용자 이름은 3자 이상이어야 합니다.';
+                errorMessage = '사용자 아이디는 3자 이상이어야 합니다.';
             } else if (input.value.length > 150) {
                 isValid = false;
-                errorMessage = '사용자 이름은 150자 이하여야 합니다.';
+                errorMessage = '사용자 아이디는 150자 이하여야 합니다.';
             } else if (!/^[\w.@+-]+$/.test(input.value)) {
                 isValid = false;
-                errorMessage = '사용자 이름은 문자, 숫자, @/./+/-/_ 만 사용할 수 있습니다.';
+                errorMessage = '사용자 아이디는 문자, 숫자, @/./+/-/_ 만 사용할 수 있습니다.';
             } else {
                 // 중복 체크
                 checkUsernameAvailability(input.value).then(exists => {
                     if (exists) {
                         input.classList.add('is-invalid');
-                        feedback.textContent = '이미 사용 중인 사용자 이름입니다.';
+                        feedback.textContent = '이미 사용 중인 사용자 아이디입니다.';
                         isValid = false;
                     }
                 });
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
 
-    // 사용자 이름 중복 체크 함수
+    // 사용자 아이디 중복 체크 함수
     async function checkUsernameAvailability(username) {
         try {
             const response = await fetch(`/accounts/check-username/?username=${encodeURIComponent(username)}`);
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 사용자 이름 입력 시 디바운스 처리
+    // 사용자 아이디 입력 시 디바운스 처리
     let usernameTimeout;
     const usernameInput = document.getElementById('id_username');
     if (usernameInput) {

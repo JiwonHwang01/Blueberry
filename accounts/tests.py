@@ -47,4 +47,4 @@ class AccountsTests(TestCase):
             'password': 'wrongpassword',
         })
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '사용자 이름 또는 비밀번호가 올바르지 않습니다.')
+        self.assertContains(response, '사용자 아이디 또는 비밀번호가 올바르지 않습니다.')
