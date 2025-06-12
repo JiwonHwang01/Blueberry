@@ -5,12 +5,19 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 def item_list(request):
+    print("item_list")
     items = Item.objects.all()
     return render(request, 'items/item_list.html', {'items': items})
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def item_detail(request, pk):
-    item = get_object_or_404(Item, pk=pk)
-    return render(request, 'items/item_detail.html', {'item': item})
+    try:
+        item = get_object_or_404(Item, pk=pk)
+        return render(request, 'items/item_detail.html', {'item': item})
+    except Exception as e:
+        print(f"Error: {str(e)}")  # 에러 로깅
+        return Response({"error": str(e)}, status=500)
 
 # API Views
 @api_view(['GET'])
@@ -21,7 +28,7 @@ def item_list_api(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def item_detail_api(request, pk):
     item = get_object_or_404(Item, pk=pk)
     serializer = ItemSerializer(item)
