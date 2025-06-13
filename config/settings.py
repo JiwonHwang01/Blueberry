@@ -12,19 +12,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+load_dotenv()
+SECRET_KEY = os.getenv('SECRET_KEY')
+BANK_ACCOUNT = {
+    'BANK_NAME': os.getenv('BANK_NAME'),
+    'ACCOUNT_NUMBER': os.getenv('BANK_ACCOUNT'),
+} 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o7b5(i64c@c7($!835=+(tdk_$3m^wjvhe*otmas25+xrpp(lf'
+#SECRET_KEY = 'django-insecure-o7b5(i64c@c7($!835=+(tdk_$3m^wjvhe*otmas25+xrpp(lf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['3.110.158.222', 'localhost', '127.0.0.1']
 
@@ -60,7 +64,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -68,9 +71,9 @@ MIDDLEWARE = [
 
 ]
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-    'http://localhost:8000',
-    'http://127.0.0.1:8080',
+  'http://localhost:8080',
+  'http://localhost:8000',
+  'http://127.0.0.1:8080',
     'http://192.168.219.56:8080',
     'http://localhost:3000',  # For vanilla frontend
 ]

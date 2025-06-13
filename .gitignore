@@ -11,3 +11,6 @@ run_servers.py
 
 # 정적 파일 디렉토리
 staticfiles/
+
+# 환경 변수
+.env
