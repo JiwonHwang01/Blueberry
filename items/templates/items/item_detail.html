@@ -8,7 +8,11 @@
                 <div class="card-body p-4">
                     <h2 class="card-title mb-3">{{ item.name }}</h2>
                     <p class="text-muted mb-4">카테고리: {{ item.get_category_display }}</p>
-                    
+                    <div class="item-image">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-fluid">
+                        {% endif %}
+                    </div>
                     <div class="price-info mb-4">
                         <h4 class="text-success mb-3">가격 정보</h4>
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -78,6 +82,54 @@
         margin-top: 1rem;
         justify-content: center;
         gap: 1rem;
+    }
+    /* 이미지 모바일 최적화 */
+    .item-image {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .item-image img {
+        max-width: 100%;
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        object-fit: contain;
+    }
+    
+    /* 모바일 화면에서의 이미지 최적화 */
+    @media (max-width: 768px) {
+        .item-image img {
+            max-height: 300px;
+            max-width: 90%;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .price-info {
+            padding: 15px;
+        }
+    }
+    
+    /* 더 작은 모바일 화면 */
+    @media (max-width: 480px) {
+        .item-image img {
+            max-height: 250px;
+            max-width: 100%;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
     }
 </style>
 {% endblock %}
