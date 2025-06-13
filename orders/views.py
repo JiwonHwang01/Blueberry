@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
 
 # Create your views here.
 @login_required
@@ -18,6 +19,15 @@ def create_order(request):
             order.user = request.user
             order.status = "pending"
             order.save()
+            
+            # 주문 정보를 세션에 저장 (Decimal 값을 문자열로 변환)
+            request.session['last_order'] = {
+                'item_name': order.item.name,
+                'size': order.get_size_display(),
+                'quantity': str(order.quantity),
+                'total_price': str(order.total_price)
+            }
+            
             return redirect('order_success') # 주문 완료 페이지로
         
     else:
@@ -26,7 +36,12 @@ def create_order(request):
 
 @login_required
 def order_success(request):
-    return render(request, 'orders/order_success.html')
+    # 세션에서 주문 정보 가져오기
+    order_info = request.session.get('last_order', {})
+    return render(request, 'orders/order_success.html', {
+        'order_info': order_info,
+        'settings': settings
+    })
 
 @login_required
 def order_list(request):
@@ -40,7 +55,11 @@ def order_detail(request, order_number):
         order = get_object_or_404(Order, order_number=order_number)
     else:
         order = get_object_or_404(Order, order_number=order_number, user=request.user)
-    return render(request, 'orders/order_detail.html', {'order': order})
+    print(settings.BANK_ACCOUNT)
+    return render(request, 'orders/order_detail.html', {
+        'order': order,
+        'settings': settings
+    })
 
 @login_required
 def request_cancel(request, order_id):

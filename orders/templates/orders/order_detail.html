@@ -3,6 +3,17 @@
 {% block content %}
 <div class="container">
     <h2>주문 상세 정보</h2>
+    <div class="order-detail" id="deposit-detail">
+        <div class="order-section" id="deposit-info">
+            <h3>입금 정보</h3>
+            <div class="account-info">
+                <p><strong> {{ settings.BANK_ACCOUNT.BANK_NAME }}<br>{{ settings.BANK_ACCOUNT.ACCOUNT_NUMBER }}</strong></p>
+                <button class="copy-btn" onclick="copyAccountNumber()">
+                    복사하기
+                </button>
+            </div>
+        </div>  
+    </div> 
     <div class="order-detail">
         <div class="order-section">
             <h3>주문 정보</h3>
@@ -90,5 +101,59 @@
     .btn-danger {
         background-color: #dc3545;
     }
+    .account-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+        background-color: #804c7d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s;
+    }
+    
+    .copy-btn:hover {
+        background-color: #6a3f67;
+    }
+    
+    #deposit-detail {
+        margin-top: 1rem;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .order-section #deposit-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+    }
 </style>
+<script>
+    function copyAccountNumber() {
+        const accountNumber = '{{ settings.BANK_ACCOUNT.ACCOUNT_NUMBER }}';
+        navigator.clipboard.writeText(accountNumber).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> 복사완료';
+            btn.style.backgroundColor = '#28a745';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '#804c7d';
+            }, 2000);
+        });
+    }
+    </script>
 {% endblock %} 
