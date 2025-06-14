@@ -57,61 +57,61 @@ jobs:
             python manage.py collectstatic --noinput
 
             sudo bash -c "cat > /etc/systemd/system/blueberry.service" << 'EOF'
-[Unit]
-Description=Blueberry Gunicorn Service
-After=network.target
+            [Unit]
+            Description=Blueberry Gunicorn Service
+            After=network.target
 
-[Service]
-User=ubuntu
-Group=www-data
-WorkingDirectory=/home/ubuntu/blueberry
-Environment="PATH=/home/ubuntu/blueberry/venv/bin"
-Environment="DJANGO_SETTINGS_MODULE=config.settings"
-ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application --timeout 120
-Restart=always
-RestartSec=10
+            [Service]
+            User=ubuntu
+            Group=www-data
+            WorkingDirectory=/home/ubuntu/blueberry
+            Environment="PATH=/home/ubuntu/blueberry/venv/bin"
+            Environment="DJANGO_SETTINGS_MODULE=config.settings"
+            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application --timeout 120
+            Restart=always
+            RestartSec=10
 
-[Install]
-WantedBy=multi-user.target
-EOF
+            [Install]
+            WantedBy=multi-user.target
+            EOF
 
-            sudo bash -c "cat > /etc/nginx/sites-available/blueberry" << 'EOF'
-server {
-    listen 80;
-    server_name _;
+                        sudo bash -c "cat > /etc/nginx/sites-available/blueberry" << 'EOF'
+            server {
+                listen 80;
+                server_name _;
 
-    client_max_body_size 20M;
+                client_max_body_size 20M;
 
-    location = /favicon.ico {
-        access_log off;
-        log_not_found off;
-    }
+                location = /favicon.ico {
+                    access_log off;
+                    log_not_found off;
+                }
 
-    location /static/ {
-        alias /home/ubuntu/blueberry/staticfiles/;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
+                location /static/ {
+                    alias /home/ubuntu/blueberry/staticfiles/;
+                    expires 1y;
+                    add_header Cache-Control "public, immutable";
+                }
 
-    location /media/ {
-        alias /home/ubuntu/blueberry/media/;
-        expires 1y;
-        add_header Cache-Control "public";
-    }
+                location /media/ {
+                    alias /home/ubuntu/blueberry/media/;
+                    expires 1y;
+                    add_header Cache-Control "public";
+                }
 
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/home/ubuntu/blueberry/blueberry.sock;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-}
-EOF
+                location / {
+                    include proxy_params;
+                    proxy_pass http://unix:/home/ubuntu/blueberry/blueberry.sock;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    proxy_connect_timeout 60s;
+                    proxy_send_timeout 60s;
+                    proxy_read_timeout 60s;
+                }
+            }
+            EOF
 
             sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
             sudo rm -f /etc/nginx/sites-enabled/default
