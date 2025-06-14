@@ -7,8 +7,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -25,118 +27,126 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Setup Server
+      - name: Initial Server Setup
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           ssh ubuntu@$EC2_HOST '
-            # 시스템 업데이트
             sudo apt update
             sudo apt upgrade -y
+            sudo apt install -y python3-pip python3-venv python3-dev nginx git
+            sudo apt install -y build-essential libssl-dev libffi-dev
+            sudo apt install -y libjpeg-dev zlib1g-dev pkg-config libcairo2-dev
 
-            # 필요한 패키지 설치
-            sudo apt install -y python3-pip python3-venv nginx
+            mkdir -p ~/blueberry
+            cd ~/blueberry
 
-            # 프로젝트 디렉토리 생성
-            mkdir -p /home/ubuntu/blueberry
-            cd /home/ubuntu/blueberry
+            rm -rf venv
+            rm -rf *
 
-            # Python 가상환경 생성
-            python3 -m venv venv
-            source venv/bin/activate
-
-            # Git 설치 및 프로젝트 클론
-            sudo apt install -y git
             git clone https://github.com/JiwonHwang01/Blueberry.git .
 
-            # 의존성 설치
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip
             pip install -r requirements.txt
-            pip install gunicorn Pillow
 
-            # 정적 파일 디렉토리 생성
-            mkdir -p static
-            mkdir -p media
+            mkdir -p staticfiles media templates
 
-            # Gunicorn 서비스 설정
-            sudo tee /etc/systemd/system/blueberry.service << EOF
-            [Unit]
-            Description=Blueberry Gunicorn Service
-            After=network.target
+            python manage.py migrate
+            python manage.py collectstatic --noinput
 
-            [Service]
-            User=ubuntu
-            Group=www-data
-            WorkingDirectory=/home/ubuntu/blueberry
-            Environment="PATH=/home/ubuntu/blueberry/venv/bin"
-            Environment="DJANGO_SETTINGS_MODULE=config.settings"
-            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 2 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application
-            Restart=always
+            sudo bash -c "cat > /etc/systemd/system/blueberry.service" << 'EOF'
+[Unit]
+Description=Blueberry Gunicorn Service
+After=network.target
 
-            [Install]
-            WantedBy=multi-user.target
-            EOF
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/blueberry
+Environment="PATH=/home/ubuntu/blueberry/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=config.settings"
+ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application --timeout 120
+Restart=always
+RestartSec=10
 
-            # Nginx 설정
-            sudo tee /etc/nginx/sites-available/blueberry << EOF
-            server {
-                listen 80;
-                server_name _;
+[Install]
+WantedBy=multi-user.target
+EOF
 
-                location = /favicon.ico { access_log off; log_not_found off; }
-                
-                location /static/ {
-                    root /home/ubuntu/blueberry;
-                }
+            sudo bash -c "cat > /etc/nginx/sites-available/blueberry" << 'EOF'
+server {
+    listen 80;
+    server_name _;
 
-                location /media/ {
-                    root /home/ubuntu/blueberry;
-                }
+    client_max_body_size 20M;
 
-                location / {
-                    include proxy_params;
-                    proxy_pass http://unix:/home/ubuntu/blueberry/blueberry.sock;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto \$scheme;
-                }
-            }
-            EOF
+    location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
 
-            # Nginx 설정 활성화
-            sudo ln -s /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
+    location /static/ {
+        alias /home/ubuntu/blueberry/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /media/ {
+        alias /home/ubuntu/blueberry/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/blueberry/blueberry.sock;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+EOF
+
+            sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
             sudo rm -f /etc/nginx/sites-enabled/default
 
-            # 권한 설정
-            sudo chown -R ubuntu:www-data /home/ubuntu/blueberry
-            sudo chmod -R 755 /home/ubuntu/blueberry
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/blueberry
+            sudo chmod -R 775 /home/ubuntu/blueberry/staticfiles /home/ubuntu/blueberry/media
 
-            # 서비스 시작
             sudo systemctl daemon-reload
-            sudo systemctl start blueberry
             sudo systemctl enable blueberry
-            sudo systemctl restart nginx
+            sudo systemctl restart blueberry
 
-            # 방화벽 설정
+            sudo nginx -t && sudo systemctl restart nginx
+
             sudo ufw allow "Nginx Full"
             sudo ufw allow OpenSSH
-            sudo ufw --force enable'
+            sudo ufw --force enable
+          '
 
       - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          echo "Deploying to EC2 host: $EC2_HOST"
           ssh ubuntu@$EC2_HOST '
-            cd /home/ubuntu/blueberry &&
+            cd ~/blueberry &&
             git reset --hard &&
             git clean -fd &&
             git pull origin master &&
             source venv/bin/activate &&
             pip install -r requirements.txt &&
-            pip install Pillow &&
             python manage.py migrate &&
             python manage.py collectstatic --noinput &&
+            sudo chown -R ubuntu:ubuntu ~/blueberry &&
+            sudo chmod -R 775 ~/blueberry/staticfiles ~/blueberry/media &&
             sudo systemctl restart blueberry &&
-            sudo systemctl status blueberry &&
-            sudo journalctl -u blueberry -n 50'
+            sudo systemctl restart nginx &&
+            sudo systemctl status blueberry --no-pager &&
+            sudo journalctl -u blueberry -n 20 --no-pager
+          '
