@@ -26,13 +26,10 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Export environment variables
-        run: |
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
               
       - name: Initial Server Setup
         env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           ssh ubuntu@$EC2_HOST '
