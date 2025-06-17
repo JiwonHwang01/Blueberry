@@ -136,14 +136,14 @@ jobs:
           '
 
       - name: Enable and Start Systemd Service
-              env:
-                EC2_HOST: ${{ secrets.EC2_HOST }}
-              run: |
-                ssh ubuntu@$EC2_HOST '
-                  sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
-                  sudo rm -f /etc/nginx/sites-enabled/default
-                  sudo nginx -t && sudo systemctl restart nginx
-                '
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
+            sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
+            sudo rm -f /etc/nginx/sites-enabled/default
+            sudo nginx -t && sudo systemctl restart nginx
+          '
 
       - name: Setup Permissions and Firewall
         env:
