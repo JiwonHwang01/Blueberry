@@ -29,6 +29,7 @@ jobs:
               
       - name: Initial Server Setup
         env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           ssh ubuntu@$EC2_HOST '
