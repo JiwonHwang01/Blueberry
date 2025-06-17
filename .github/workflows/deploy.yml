@@ -79,8 +79,13 @@ jobs:
 
             [Install]
             WantedBy=multi-user.target
-            EOF
+          '
 
+      - name: Enable and Start Systemd Service
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
             sudo systemctl daemon-reload
             sudo systemctl enable blueberry
             sudo systemctl restart blueberry
@@ -128,11 +133,17 @@ jobs:
                 }
             }
             EOF
-
-            sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
-            sudo rm -f /etc/nginx/sites-enabled/default
-            sudo nginx -t && sudo systemctl restart nginx
           '
+
+      - name: Enable and Start Systemd Service
+              env:
+                EC2_HOST: ${{ secrets.EC2_HOST }}
+              run: |
+                ssh ubuntu@$EC2_HOST '
+                  sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
+                  sudo rm -f /etc/nginx/sites-enabled/default
+                  sudo nginx -t && sudo systemctl restart nginx
+                '
 
       - name: Setup Permissions and Firewall
         env:
@@ -141,6 +152,13 @@ jobs:
           ssh ubuntu@$EC2_HOST '
             sudo chown -R ubuntu:ubuntu /home/ubuntu/blueberry
             sudo chmod -R 775 /home/ubuntu/blueberry/staticfiles /home/ubuntu/blueberry/media
+          '
+
+      - name: Configure Firewall
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
             sudo ufw allow "Nginx Full"
             sudo ufw allow OpenSSH
             sudo ufw --force enable
