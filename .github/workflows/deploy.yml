@@ -68,15 +68,14 @@ jobs:
             WorkingDirectory=/home/ubuntu/blueberry
             Environment="PATH=/home/ubuntu/blueberry/venv/bin"
             Environment="DJANGO_SETTINGS_MODULE=config.settings"
-            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application --timeout 120
+            ExecStart=/home/ubuntu/blueberry/venv/bin/gunicorn --workers 2 --bind unix:/home/ubuntu/blueberry/blueberry.sock config.wsgi:application --timeout 120
             Restart=always
             RestartSec=10
 
             [Install]
             WantedBy=multi-user.target
-            EOF
-
-                        sudo bash -c "cat > /etc/nginx/sites-available/blueberry" << 'EOF'
+            
+            cat << 'EOF' | sudo tee /etc/nginx/sites-available/blueberry > /dev/null
             server {
                 listen 80;
                 server_name _;
