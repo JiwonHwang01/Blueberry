@@ -29,7 +29,6 @@ jobs:
               
       - name: Initial Server Setup
         env:
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           ssh ubuntu@$EC2_HOST '
@@ -56,8 +55,14 @@ jobs:
 
             python manage.py migrate
             python manage.py collectstatic --noinput
+          '
 
-            sudo bash -c "cat > /etc/systemd/system/blueberry.service" << 'EOF'
+      - name: Setup Systemd Service
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
+            sudo bash -c "cat > /etc/systemd/system/blueberry.service" << EOF
             [Unit]
             Description=Blueberry Gunicorn Service
             After=network.target
@@ -74,8 +79,19 @@ jobs:
 
             [Install]
             WantedBy=multi-user.target
-            
-            cat << 'EOF' | sudo tee /etc/nginx/sites-available/blueberry > /dev/null
+            EOF
+
+            sudo systemctl daemon-reload
+            sudo systemctl enable blueberry
+            sudo systemctl restart blueberry
+          '
+
+      - name: Setup Nginx Configuration
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
+            sudo bash -c "cat > /etc/nginx/sites-available/blueberry" << EOF
             server {
                 listen 80;
                 server_name _;
@@ -115,16 +131,16 @@ jobs:
 
             sudo ln -sf /etc/nginx/sites-available/blueberry /etc/nginx/sites-enabled
             sudo rm -f /etc/nginx/sites-enabled/default
+            sudo nginx -t && sudo systemctl restart nginx
+          '
 
+      - name: Setup Permissions and Firewall
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh ubuntu@$EC2_HOST '
             sudo chown -R ubuntu:ubuntu /home/ubuntu/blueberry
             sudo chmod -R 775 /home/ubuntu/blueberry/staticfiles /home/ubuntu/blueberry/media
-
-            sudo systemctl daemon-reload
-            sudo systemctl enable blueberry
-            sudo systemctl restart blueberry
-
-            sudo nginx -t && sudo systemctl restart nginx
-
             sudo ufw allow "Nginx Full"
             sudo ufw allow OpenSSH
             sudo ufw --force enable
