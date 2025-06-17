@@ -132,10 +132,9 @@ jobs:
                     proxy_read_timeout 60s;
                 }
             }
-            EOF
           '
 
-      - name: Enable and Start Systemd Service
+      - name: Enable and Start Nginx
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
