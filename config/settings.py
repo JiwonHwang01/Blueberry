@@ -24,10 +24,6 @@ BANK_ACCOUNT = {
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-o7b5(i64c@c7($!835=+(tdk_$3m^wjvhe*otmas25+xrpp(lf'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['52.79.236.66', 'localhost', '127.0.0.1']
